@@ -68,7 +68,7 @@ public class WifiAdmin extends CordovaPlugin {
 			JSONObject activity = new JSONObject();
 			activity.put("BSSID", wifiInfo.getBSSID());
 			activity.put("HiddenSSID", wifiInfo.getHiddenSSID());
-			activity.put("SSID", wifiInfo.getSSID());
+			activity.put("SSID", getSSID(wifiInfo));
 			activity.put("MacAddress", wifiInfo.getMacAddress());
 			activity.put("IpAddress", wifiInfo.getIpAddress());
 			activity.put("NetworkId", wifiInfo.getNetworkId());
@@ -97,6 +97,24 @@ public class WifiAdmin extends CordovaPlugin {
 		callbackContext.success(obj);
 
     	return null;
+    }
+
+    /**
+     * Strips out double quotes from SSID if present.
+     *
+     * @see https://developer.android.com/reference/android/net/wifi/WifiInfo.html#getSSID()
+     * Returns the service set identifier (SSID) of the current 802.11 network.
+     * If the SSID can be decoded as UTF-8, it will be returned surrounded by
+     * double quotation marks. Otherwise, it is returned as a string of hex
+     * digits. The SSID may be <unknown ssid> if there is no network currently
+     * connected.
+     */
+    private String getSSID(final WifiInfo wifiInfo) {
+        String ssid = wifiInfo.getSSID();
+        if (ssid.startsWith("\"") && ssid.endsWith("\"")) {
+            ssid = ssid.substring(1, ssid.length() - 1);
+        }
+        return ssid;
     }
 
     private PluginResult executeEnableWifi(JSONArray inputs, CallbackContext callbackContext) {
